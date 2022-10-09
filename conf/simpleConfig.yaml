@@ -1,0 +1,7 @@
+server:
+  mysql:
+    host: ''
+    port: 3306
+    schema: 'monaPanel'
+    user: 'root'
+    password: '1234567'
