@@ -14,8 +14,14 @@ import (
 func main() {
 	bootstrap.InitConfig()
 	global.Log = bootstrap.InitLog()
-
 	global.Log.Info("Log system start ok.")
+	global.DB = bootstrap.InitDatabase()
+	defer func() {
+		if global.DB != nil {
+			db, _ := global.DB.DB()
+			db.Close()
+		}
+	}()
 
 	r := gin.Default()
 
