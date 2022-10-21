@@ -1,0 +1,11 @@
+version: '3'
+services:
+  monaPanelWeb:
+    restart: always
+    image: vue-dev:v1
+    container_name: monaPanelWeb
+    hostname: monaPanelWeb
+    ports:
+      - 10258:9527
+    volumes:
+      - ./vue/vue-element-admin:/app
