@@ -4,17 +4,20 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package main
 
 import (
-	"fmt"
-	"github.com/gin-gonic/gin"
 	"monaPanel/bootstrap"
 	"monaPanel/global"
-	"net/http"
 )
 
 func main() {
+
+	// 初始化配置文件，读取应用配置
 	bootstrap.InitConfig()
+
+	// 初始化log模块
 	global.Log = bootstrap.InitLog()
 	global.Log.Info("Log system start ok.")
+
+	// 初始化 gorm 数据库
 	global.DB = bootstrap.InitDatabase()
 	defer func() {
 		if global.DB != nil {
@@ -23,13 +26,6 @@ func main() {
 		}
 	}()
 
-	r := gin.Default()
-
-	r.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong")
-	})
-
-	serverConf := global.Config.Server
-
-	r.Run(fmt.Sprintf("%s:%s", serverConf.Listen, serverConf.Port))
+	// 启动 go-gin web服务器
+	bootstrap.RunServer()
 }
