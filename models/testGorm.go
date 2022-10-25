@@ -6,5 +6,5 @@ type TestGorm struct {
 	Mobile   string `json:"mobile" gorm:"not_null;index;comment:手机号码"`
 	Password string `json:"password" gorm:"not_null;default:'';comment:登录密码"`
 	CommonTime
-	DeleteStat
+	DeleteTime
 }

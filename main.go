@@ -26,6 +26,9 @@ func main() {
 		}
 	}()
 
+	// 初始化验证器
+	bootstrap.InitializeValidator()
+
 	// 启动 go-gin web服务器
 	bootstrap.RunServer()
 }

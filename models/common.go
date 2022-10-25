@@ -10,10 +10,10 @@ type ID struct {
 }
 
 type CommonTime struct {
-	CreateTime time.Time `json:"create_time"`
-	UpdateTime time.Time `json:"update_time"`
+	CreateTime time.Time `json:"create_time" gorm:"autoCreateTime"`
+	UpdateTime time.Time `json:"update_time" gorm:"autoUpdateTime"`
 }
 
-type DeleteStat struct {
-	deleteStat gorm.DeletedAt `json:"delete_stat" gorm:"index"`
+type DeleteTime struct {
+	DeleteTime gorm.DeletedAt `json:"delete_time" gorm:"index"`
 }
