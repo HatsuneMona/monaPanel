@@ -68,7 +68,7 @@ func initDbTables(db *gorm.DB) {
 		models.TestGorm{},
 		models.User{},
 	); err != nil {
-		global.Log.Error("migrate tables faild.", zap.Any("err", err))
+		global.Log.Error("migrate tables failed.", zap.Any("err", err))
 		os.Exit(-1)
 	}
 }
