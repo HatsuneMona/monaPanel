@@ -48,3 +48,11 @@ func (userService *userService) Login(params request.Login) (err error, user *mo
 
 	return
 }
+
+func (userService *userService) GetUserInfoById(userId int) (err error, user models.User) {
+	err = global.DB.First(&user, userId).Error
+	if err != nil {
+		err = errors.New("未找到该用户")
+	}
+	return
+}

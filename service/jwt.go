@@ -15,7 +15,7 @@ type JwtUser interface {
 	GetUid() string
 }
 
-type panelClaims struct {
+type PanelClaims struct {
 	jwt.RegisteredClaims
 	// JWT 官方规定的七个字段
 	// iss (issuer)：签发人
@@ -25,7 +25,7 @@ type panelClaims struct {
 	// nbf (Not Before)：生效时间
 	// iat (Issued At)：签发时间
 	// jti (JWT ID)：编号
-	loginName string `json:"loginName"`
+	UserId string `json:"user_id"`
 }
 
 type claimsToken struct {
@@ -36,13 +36,13 @@ type claimsToken struct {
 func (jwtService *jwtService) CreateToken(user JwtUser) (token claimsToken, err error) {
 	tokenData := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
-		panelClaims{
+		PanelClaims{
 			RegisteredClaims: jwt.RegisteredClaims{
 				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(global.Config.Jwt.JwtTtl))), // 过期时间
 				NotBefore: jwt.NewNumericDate(time.Now()),                                                            // 生效时间
 				IssuedAt:  jwt.NewNumericDate(time.Now()),                                                            // 签发时间
 			},
-			loginName: user.GetUid(),
+			UserId: user.GetUid(),
 		},
 	)
 
