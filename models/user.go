@@ -1,5 +1,9 @@
 package models
 
+import (
+	"strconv"
+)
+
 type User struct {
 	ID
 	LoginName string `json:"loginName" gorm:"type:varchar(32);not_null;comment:登录用户名"`
@@ -8,4 +12,8 @@ type User struct {
 	Password  string `json:"password" gorm:"type:varchar(128);not_null;comment:密码"`
 	CommonTime
 	DeleteTime
+}
+
+func (u *User) GetUid() string {
+	return strconv.Itoa(int(u.Id))
 }

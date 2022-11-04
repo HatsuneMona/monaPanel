@@ -7,9 +7,13 @@ import (
 )
 
 func SetApiGroupRoutes(router *gin.RouterGroup) {
-	router.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong")
-	})
+	router.GET(
+		"/ping", func(c *gin.Context) {
+			c.String(http.StatusOK, "pong")
+		},
+	)
 
 	router.POST("/auth/register", controllers.Register)
+
+	router.POST("/auth/login", controllers.Login)
 }

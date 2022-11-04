@@ -5,4 +5,5 @@ type MonaPanelConfig struct {
 	Server   Server   `mapstructure:"server" json:"env" yaml:"env"`
 	Log      Log      `mapstructure:"log" json:"log" yaml:"log"`
 	Database Database `mapstructure:"database" json:"database" yaml:"database"`
+	Jwt      Jwt      `mapstructure:"jwt" json:"jwt" yaml:"jwt"`
 }

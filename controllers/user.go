@@ -24,3 +24,22 @@ func Register(c *gin.Context) {
 		response.Success(c, user)
 	}
 }
+
+func Login(c *gin.Context) {
+	var form request.Login
+
+	if err := c.ShouldBindJSON(&form); err != nil {
+		response.ValidateFail(c, request.GetErrorMsg(form, err))
+	}
+
+	if err, user := service.UserService.Login(form); err != nil {
+		response.ServiceFail(c, err.Error())
+	} else {
+		tokenData, err := service.JwtService.CreateToken(user)
+		if err != nil {
+			response.ServiceFail(c, err.Error())
+			return
+		}
+		response.Success(c, tokenData)
+	}
+}
