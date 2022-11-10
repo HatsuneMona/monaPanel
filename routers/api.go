@@ -2,8 +2,8 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	"monaPanel/controllers"
-	"monaPanel/middleware"
+	"monaPanel/app/controllers"
+	"monaPanel/app/middleware"
 	"net/http"
 )
 

@@ -3,9 +3,9 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"monaPanel/common/response"
+	"monaPanel/app/common/response"
+	"monaPanel/app/service"
 	"monaPanel/global"
-	"monaPanel/service"
 )
 
 func JwtAuth() gin.HandlerFunc {

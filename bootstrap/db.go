@@ -9,8 +9,8 @@ import (
 	"gorm.io/gorm/logger"
 	"io"
 	"log"
+	"monaPanel/app/models"
 	"monaPanel/global"
-	"monaPanel/models"
 	"os"
 	"strconv"
 	"time"
@@ -47,10 +47,12 @@ func initMysqlGorm() *gorm.DB {
 		SkipInitializeWithVersion: false, // 根据版本自动配置
 	}
 
-	if db, err := gorm.Open(mysql.New(mysqlConfig), &gorm.Config{
-		DisableForeignKeyConstraintWhenMigrating: true,            // 禁用自动创建外键约束
-		Logger:                                   getGormLogger(), // 使用自定义 Logger
-	}); err != nil {
+	if db, err := gorm.Open(
+		mysql.New(mysqlConfig), &gorm.Config{
+			DisableForeignKeyConstraintWhenMigrating: true,            // 禁用自动创建外键约束
+			Logger:                                   getGormLogger(), // 使用自定义 Logger
+		},
+	); err != nil {
 		global.Log.Error("mysql connect failed, err:", zap.Any("err", err))
 		return nil
 	} else {
@@ -109,11 +111,13 @@ func getGormLogger() logger.Interface {
 		logMode = logger.Info
 	}
 
-	return logger.New(getGormLogWriter(), logger.Config{
-		SlowThreshold:             200 * time.Millisecond,                      // 慢 SQL 阈值
-		LogLevel:                  logMode,                                     // 日志级别
-		IgnoreRecordNotFoundError: false,                                       // 忽略ErrRecordNotFound（记录未找到）错误
-		Colorful:                  !global.Config.Database.EnableFileLogWriter, // 禁用彩色打印
-	})
+	return logger.New(
+		getGormLogWriter(), logger.Config{
+			SlowThreshold:             200 * time.Millisecond,                      // 慢 SQL 阈值
+			LogLevel:                  logMode,                                     // 日志级别
+			IgnoreRecordNotFoundError: false,                                       // 忽略ErrRecordNotFound（记录未找到）错误
+			Colorful:                  !global.Config.Database.EnableFileLogWriter, // 禁用彩色打印
+		},
+	)
 
 }

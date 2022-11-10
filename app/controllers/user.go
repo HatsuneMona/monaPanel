@@ -2,23 +2,23 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"monaPanel/common/request"
-	"monaPanel/common/response"
+	request2 "monaPanel/app/common/request"
+	"monaPanel/app/common/response"
+	service2 "monaPanel/app/service"
 	"monaPanel/global"
-	"monaPanel/service"
 	"strconv"
 )
 
 // Register 注册接口
 func Register(c *gin.Context) {
-	var form request.Register
+	var form request2.Register
 
 	if err := c.ShouldBindJSON(&form); err != nil {
-		response.ValidateFail(c, request.GetErrorMsg(form, err))
+		response.ValidateFail(c, request2.GetErrorMsg(form, err))
 		return
 	}
 
-	if err, user := service.UserService.Register(form); err != nil {
+	if err, user := service2.UserService.Register(form); err != nil {
 		global.Log.Error(err.Error())
 		response.ServiceFail(c, err.Error())
 	} else {
@@ -28,16 +28,16 @@ func Register(c *gin.Context) {
 
 // Login 登录接口
 func Login(c *gin.Context) {
-	var form request.Login
+	var form request2.Login
 
 	if err := c.ShouldBindJSON(&form); err != nil {
-		response.ValidateFail(c, request.GetErrorMsg(form, err))
+		response.ValidateFail(c, request2.GetErrorMsg(form, err))
 	}
 
-	if err, user := service.UserService.Login(form); err != nil {
+	if err, user := service2.UserService.Login(form); err != nil {
 		response.ServiceFail(c, err.Error())
 	} else {
-		tokenData, err := service.JwtService.CreateToken(user)
+		tokenData, err := service2.JwtService.CreateToken(user)
 		if err != nil {
 			response.ServiceFail(c, err.Error())
 			return
@@ -54,7 +54,7 @@ func GetUserInfo(c *gin.Context) {
 		return
 	}
 
-	err, user := service.UserService.GetUserInfoById(userId)
+	err, user := service2.UserService.GetUserInfoById(userId)
 	if err != nil {
 		response.ServiceFail(c, err.Error())
 		return
