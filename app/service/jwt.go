@@ -1,8 +1,11 @@
 package service
 
 import (
+	"context"
 	jwt "github.com/golang-jwt/jwt/v4"
 	"monaPanel/global"
+	"monaPanel/utils"
+	"strconv"
 	"time"
 )
 
@@ -15,7 +18,7 @@ type JwtUser interface {
 	GetUid() string
 }
 
-type PanelClaims struct {
+type AdminUserClaims struct {
 	jwt.RegisteredClaims
 	// JWT 官方规定的七个字段
 	// iss (issuer)：签发人
@@ -33,10 +36,11 @@ type claimsToken struct {
 	ExpiresIn   int    `json:"expires_in"`
 }
 
+// CreateToken 为用户生成 jwt token
 func (jwtService *jwtService) CreateToken(user JwtUser) (token claimsToken, err error) {
 	tokenData := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
-		PanelClaims{
+		AdminUserClaims{
 			RegisteredClaims: jwt.RegisteredClaims{
 				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(global.Config.Jwt.JwtTtl))), // 过期时间
 				NotBefore: jwt.NewNumericDate(time.Now()),                                                            // 生效时间
@@ -54,4 +58,32 @@ func (jwtService *jwtService) CreateToken(user JwtUser) (token claimsToken, err 
 	}
 
 	return
+}
+
+// getBlackListKey 生成jwt的唯一key
+func (jwtService *jwtService) getBlackListKey(tokenStr string) string {
+	return "jwt_black_list:" + utils.MD5([]byte(tokenStr))
+}
+
+// JoinBlackList token 加入黑名单
+func (jwtService *jwtService) JoinBlackList(token *jwt.Token) (err error) {
+	nowUnix := time.Now().Unix()
+	timer := time.Duration(token.Claims.(*AdminUserClaims).ExpiresAt.Unix()-nowUnix) * time.Second
+	// 将 token 剩余时间设置为缓存有效期，并将当前时间作为缓存 value 值
+	err = global.Redis.SetNX(context.Background(), jwtService.getBlackListKey(token.Raw), nowUnix, timer).Err()
+	return
+}
+
+// IsInBlacklist token 是否在黑名单中
+func (jwtService *jwtService) IsInBlacklist(tokenStr string) bool {
+	joinUnixStr, err := global.Redis.Get(context.Background(), jwtService.getBlackListKey(tokenStr)).Result()
+	joinBlackUnix, err := strconv.ParseInt(joinUnixStr, 10, 64)
+	if joinUnixStr == "" || err != nil {
+		return false
+	}
+	// JwtBlacklistGracePeriod 为黑名单宽限时间，避免并发请求失效
+	if time.Now().Unix()-joinBlackUnix < int64(global.Config.Jwt.JwtBlacklistGracePeriod) {
+		return false
+	}
+	return true
 }

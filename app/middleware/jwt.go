@@ -19,17 +19,19 @@ func JwtAuth() gin.HandlerFunc {
 
 		// Token 解析校验
 		token, err := jwt.ParseWithClaims(
-			tokenStr, &service.PanelClaims{}, func(token *jwt.Token) (interface{}, error) {
+			tokenStr, &service.AdminUserClaims{}, func(token *jwt.Token) (interface{}, error) {
 				return []byte(global.Config.Jwt.Secret), nil
 			},
 		)
-		if err != nil {
+		// 如果验证不通过（token无法解码），或token在黑名单中
+		// 则返回token错误
+		if err != nil || service.JwtService.IsInBlacklist(tokenStr) {
 			response.ClaimsTokenFail(c)
 			c.Abort()
 			return
 		}
 
-		claims := token.Claims.(*service.PanelClaims)
+		claims := token.Claims.(*service.AdminUserClaims)
 		// Token 发布者校验
 		c.Set("token", token)
 		c.Set("userId", claims.UserId)
