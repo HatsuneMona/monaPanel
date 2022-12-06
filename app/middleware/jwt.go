@@ -6,6 +6,8 @@ import (
 	"monaPanel/app/common/response"
 	"monaPanel/app/service"
 	"monaPanel/global"
+	"strconv"
+	"time"
 )
 
 func JwtAuth() gin.HandlerFunc {
@@ -30,8 +32,27 @@ func JwtAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
+		// jwt 里的信息
 		claims := token.Claims.(*service.AdminUserClaims)
+
+		// 续签逻辑
+		if claims.ExpiresAt.Unix()-time.Now().Unix() < global.Config.Jwt.RefreshGracePeriod {
+			lock := global.GetLock("refresh_token_lock", int64(global.Config.Jwt.JwtBlacklistGracePeriod))
+			if lock.Lock() {
+				userId, _ := strconv.Atoi(claims.UserId)
+				err, user := service.UserService.GetUserInfoById(userId)
+				if err != nil {
+					global.Log.Error(err.Error())
+					lock.Release()
+				} else {
+					tokenData, _ := service.JwtService.CreateToken(&user)
+					c.Header("new-token", tokenData.AccessToken)
+					c.Header("new-expires-in", strconv.Itoa(tokenData.ExpiresIn))
+					_ = service.JwtService.JoinBlackList(token)
+				}
+			}
+		}
+
 		// Token 发布者校验
 		c.Set("token", token)
 		c.Set("userId", claims.UserId)
