@@ -14,6 +14,6 @@ type User struct {
 	DeleteTime
 }
 
-func (u *User) GetUid() string {
+func (u User) GetUid() string {
 	return strconv.Itoa(int(u.Id))
 }
